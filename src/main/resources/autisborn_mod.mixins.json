@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "victorgponce.com.autisborn_mod.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "AUTISBORN-MOD.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
