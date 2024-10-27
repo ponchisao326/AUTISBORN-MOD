@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 public class CustomMainScreen extends Screen {
 
     public CustomMainScreen() {
-        super(Component.literal("Pantalla Personalizada"));
+        super(Component.literal("Custom Main Menu"));
     }
 
     @Override
