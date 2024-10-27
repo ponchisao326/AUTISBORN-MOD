@@ -13,8 +13,7 @@ public class CustomMainScreen extends Screen {
 
     @Override
     protected void init() {
-        // Aquí puedes agregar botones y otros elementos a tu pantalla.
-        // Ejemplo: this.addRenderableWidget(new Button(...));
+        // Buttons
     }
 
     @Override
