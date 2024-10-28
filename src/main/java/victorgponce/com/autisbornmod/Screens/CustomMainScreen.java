@@ -11,8 +11,13 @@ import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.Music;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -33,6 +38,8 @@ public class CustomMainScreen extends Screen {
     private static final String SERVER_ADDRESS = "node-marb.ponchisaohosting.xyz";
     private static final int SERVER_PORT = 25566;
     private static final Component COPYRIGHT_TEXT = Component.literal("Menu creado por PonchisaoHosting");
+    private static boolean sounding = false;
+    private static boolean first = true;
 
     public CustomMainScreen() {
         super(Component.literal("Custom Main Menu"));
@@ -42,6 +49,10 @@ public class CustomMainScreen extends Screen {
 
     @Override
     protected void init() {
+
+        playBackgroundMusic();
+
+
         // Seteamos variables de los botones
         this.minecraftInstance = Minecraft.getInstance();
         int buttonWidth = 200;
@@ -55,20 +66,21 @@ public class CustomMainScreen extends Screen {
                     // Conexión directa al servidor al pulsar el botón
                     ServerData serverData = new ServerData("AUTISBORN", SERVER_ADDRESS + ":" + SERVER_PORT, false);
                     join(serverData);
+                    Minecraft.getInstance().options.setSoundCategoryVolume(SoundSource.MUSIC, 0.0F);
                 })));
 
         this.addRenderableWidget(new Button(this.width / 2 - 100, l + 68, 98, 20,
-                Component.translatable("menu.options"), button -> executorService.submit(() ->
-                this.minecraftInstance.setScreen(new OptionsScreen(this, this.minecraftInstance.options)))));
+                Component.translatable("menu.options"), (p_96788_) -> {
+            this.minecraft.setScreen(new OptionsScreen(this, this.minecraft.options));
+        }));
 
         this.addRenderableWidget(new Button(this.width / 2 + 2, l + 68, 98, 20,
                 Component.translatable("menu.quit"), button -> executorService.submit(this.minecraftInstance::stop)));
 
         this.addRenderableWidget(new Button(this.width / 2 - 100, l + 23 * 2, buttonWidth, buttonHeight,
-                Component.translatable("fml.menu.mods"), button -> executorService.submit(() -> {
-            assert this.minecraftInstance != null;
-            this.minecraftInstance.setScreen(new net.minecraftforge.client.gui.ModListScreen(this));
-        })));
+                Component.translatable("fml.menu.mods"), button -> {
+            this.minecraft.setScreen(new net.minecraftforge.client.gui.ModListScreen(this));
+        }));
 
         // Botón de Copyright del Menu
         this.addRenderableWidget(new PlainTextButton(j - 3, this.height - 20, copyrightWidth, 10, COPYRIGHT_TEXT, (button) -> executorService.submit(() -> {
@@ -82,6 +94,7 @@ public class CustomMainScreen extends Screen {
 
     @Override
     public void render(@NotNull PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        Minecraft.getInstance().getMusicManager().stopPlaying();
         // Habilidamos las texturas y el sistema de render
         RenderSystem.enableTexture();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -128,6 +141,28 @@ public class CustomMainScreen extends Screen {
         }
     }
 
+    private void playBackgroundMusic() {
+        if (first) {
+            Minecraft.getInstance().options.setSoundCategoryVolume(SoundSource.MUSIC, 0.60F);
+            Minecraft.getInstance().getMusicManager().stopPlaying();
+            first = false;
+        }
+
+        ResourceLocation location = new ResourceLocation("victorgponce", "main_bg"); // Asegúrate de que esta ruta sea correcta
+        SoundEvent event = new SoundEvent(location);
+        SimpleSoundInstance sound = SimpleSoundInstance.forMusic(event);
+
+        if (!sounding) {
+            this.minecraftInstance.getSoundManager().play(sound);
+            sounding = true;
+        }
+        if (!Minecraft.getInstance().getSoundManager().isActive(sound)) {
+            sounding = false;
+        }
+
+    }
+
+
     private void join(ServerData p_99703_) {
         assert this.minecraft != null;
         ConnectScreen.startConnecting(this, this.minecraft, ServerAddress.parseString(p_99703_.ip), p_99703_);
@@ -136,7 +171,10 @@ public class CustomMainScreen extends Screen {
     // Al cerrar la pantalla detenemos el subproceso pues no se usa y cerramos la pantalla
     @Override
     public void onClose() {
-        executorService.shutdownNow();
-        super.onClose();
+        return;
+        // this.minecraftInstance.getSoundManager().stop();
+        // executorService.shutdownNow();
+        // super.onClose();
     }
+
 }
