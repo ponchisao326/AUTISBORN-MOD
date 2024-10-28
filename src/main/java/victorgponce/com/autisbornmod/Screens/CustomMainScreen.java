@@ -143,7 +143,7 @@ public class CustomMainScreen extends Screen {
 
     private void playBackgroundMusic() {
         if (first) {
-            Minecraft.getInstance().options.setSoundCategoryVolume(SoundSource.MUSIC, 0.60F);
+            Minecraft.getInstance().options.setSoundCategoryVolume(SoundSource.MUSIC, 0.40F);
             Minecraft.getInstance().getMusicManager().stopPlaying();
             first = false;
         }
