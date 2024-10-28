@@ -48,6 +48,7 @@ public class CustomMainScreen extends Screen {
 
         // Botón "MODS" - Abre el menú de Mods de forge
         this.addRenderableWidget(new Button(this.width / 2 - 100, l + 23 * 2, buttonWidth, buttonHeight, Component.translatable("fml.menu.mods"), button -> {
+            assert this.minecraft != null;
             this.minecraft.setScreen(new net.minecraftforge.client.gui.ModListScreen(this));
         }));
     }
