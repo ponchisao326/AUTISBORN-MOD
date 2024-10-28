@@ -2,10 +2,23 @@ package victorgponce.com.autisbornmod.Screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConnectScreen;
+import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 public class CustomMainScreen extends Screen {
+
+    private final Minecraft minecraftInstance = Minecraft.getInstance();
+    private static final int TITLE_Y_POS = 30; // Posición Y del título en pantalla
+    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation("victorgponce:autisbornmod/textures/background.png");
 
     public CustomMainScreen() {
         super(Component.literal("Custom Main Menu"));
@@ -13,14 +26,52 @@ public class CustomMainScreen extends Screen {
 
     @Override
     protected void init() {
-        // Buttons
+        int buttonWidth = 200;
+        int buttonHeight = 20;
+        int centerX = this.width / 2;
+        int l = this.height / 4 + 48;
+        int p_96764_ = l;
+        int p_96765_ = 24;
+
+        // Botón "AUTISBORN" - Conexión directa al servidor
+        this.addRenderableWidget(new Button(this.width / 2 - 100, l + 24 * 1, buttonWidth, buttonHeight,
+                Component.literal("AUTISBORN"), button ->
+                connectToServer("node-marb.ponchisaohosting.xyz", 25566)));
+
+        // Botón "Opciones" - Abre el menú de opciones
+        this.addRenderableWidget(new Button(this.width / 2 - 100, l + 72 + 12, 98, 20,
+                Component.literal("Opciones"), button -> this.minecraftInstance.setScreen(new OptionsScreen(this, this.minecraftInstance.options))));
+
+        // Botón "Quit Game" - Salir del juego
+        this.addRenderableWidget(new Button(this.width / 2 + 2, l + 72 + 12, 98, 20,
+                Component.literal("Quit Game"), button -> this.minecraftInstance.stop()));
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(poseStack); // Renderiza el fondo
-        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 15, 0xFFFFFF); // Título
+    public void render(@NotNull PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        RenderSystem.enableTexture();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
+        int width = this.width;
+        int height = this.height;
+        blit(poseStack, 0, 0, 0, 0, width, height, width, height);
+
+        // Título personalizado en el mismo lugar que el original
+        drawCenteredString(poseStack, this.font, "Custom Title Placeholder", this.width / 2, TITLE_Y_POS, 0xFFFFFF);
+
+        // Renderiza los botones y demás elementos
         super.render(poseStack, mouseX, mouseY, partialTicks);
+    }
+
+    public void connectToServer(String ip, int port) {
+        ServerData serverData = new ServerData("Servidor", ip + ":" + port, false);
+        ConnectScreen.startConnecting(
+                Minecraft.getInstance().screen,
+                Minecraft.getInstance(),
+                ServerAddress.parseString(serverData.ip),
+                serverData
+        );
     }
 }
 
