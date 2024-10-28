@@ -39,12 +39,17 @@ public class CustomMainScreen extends Screen {
                 connectToServer("node-marb.ponchisaohosting.xyz", 25566)));
 
         // Botón "Opciones" - Abre el menú de opciones
-        this.addRenderableWidget(new Button(this.width / 2 - 100, l + 72 + 12, 98, 20,
-                Component.literal("Opciones"), button -> this.minecraftInstance.setScreen(new OptionsScreen(this, this.minecraftInstance.options))));
+        this.addRenderableWidget(new Button(this.width / 2 - 100, l + 68, 98, 20,
+                Component.translatable("menu.options"), button -> this.minecraftInstance.setScreen(new OptionsScreen(this, this.minecraftInstance.options))));
 
         // Botón "Quit Game" - Salir del juego
-        this.addRenderableWidget(new Button(this.width / 2 + 2, l + 72 + 12, 98, 20,
-                Component.literal("Quit Game"), button -> this.minecraftInstance.stop()));
+        this.addRenderableWidget(new Button(this.width / 2 + 2, l + 68, 98, 20,
+                Component.translatable("menu.quit"), button -> this.minecraftInstance.stop()));
+
+        // Botón "MODS" - Abre el menú de Mods de forge
+        this.addRenderableWidget(new Button(this.width / 2 - 100, l + 23 * 2, buttonWidth, buttonHeight, Component.translatable("fml.menu.mods"), button -> {
+            this.minecraft.setScreen(new net.minecraftforge.client.gui.ModListScreen(this));
+        }));
     }
 
     @Override
