@@ -1,6 +1,5 @@
 package victorgponce.com.autisbornmod.Screens;
 
-import com.google.common.util.concurrent.Runnables;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
@@ -22,8 +21,6 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static net.minecraft.network.Connection.connectToServer;
 
 public class CustomMainScreen extends Screen {
 
@@ -54,13 +51,11 @@ public class CustomMainScreen extends Screen {
         int j = this.width - copyrightWidth - 2;
 
         this.addRenderableWidget(new Button(this.width / 2 - 100, l + 24, buttonWidth, buttonHeight,
-                Component.literal("AUTISBORN"), button -> {
-            this.minecraftInstance.execute(() -> {
-                // Conexión directa al servidor al pulsar el botón
-                ServerData serverData = new ServerData("AUTISBORN", SERVER_ADDRESS + ":" + SERVER_PORT, false);
-                join(serverData);
-            });
-        }));
+                Component.literal("AUTISBORN"), button -> this.minecraftInstance.execute(() -> {
+                    // Conexión directa al servidor al pulsar el botón
+                    ServerData serverData = new ServerData("AUTISBORN", SERVER_ADDRESS + ":" + SERVER_PORT, false);
+                    join(serverData);
+                })));
 
         this.addRenderableWidget(new Button(this.width / 2 - 100, l + 68, 98, 20,
                 Component.translatable("menu.options"), button -> executorService.submit(() ->
@@ -76,15 +71,13 @@ public class CustomMainScreen extends Screen {
         })));
 
         // Botón de Copyright del Menu
-        this.addRenderableWidget(new PlainTextButton(j - 3, this.height - 20, copyrightWidth, 10, COPYRIGHT_TEXT, (button) -> {
-            executorService.submit(() -> {
-                try {
-                    Util.getPlatform().openUrl(new URL("https://victorgponce.com"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        }, this.font));
+        this.addRenderableWidget(new PlainTextButton(j - 3, this.height - 20, copyrightWidth, 10, COPYRIGHT_TEXT, (button) -> executorService.submit(() -> {
+            try {
+                Util.getPlatform().openUrl(new URL("https://victorgponce.com"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }), this.font));
     }
 
     @Override
@@ -114,7 +107,7 @@ public class CustomMainScreen extends Screen {
     private void startPingThread() {
         executorService.submit(() -> {
             while (!Thread.currentThread().isInterrupted()) {
-                status = pingServer(SERVER_ADDRESS, SERVER_PORT) ? "El servidor se encuentra ONLINE" : "El servidor se encuentra OFFLINE";
+                status = pingServer() ? "El servidor se encuentra ONLINE" : "El servidor se encuentra OFFLINE";
                 try {
                     Thread.sleep(4000);
                 } catch (InterruptedException e) {
@@ -126,9 +119,9 @@ public class CustomMainScreen extends Screen {
     }
 
     // Pingeamos al server
-    private boolean pingServer(String address, int port) {
+    private boolean pingServer() {
         try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(address, port), 1000);
+            socket.connect(new InetSocketAddress(CustomMainScreen.SERVER_ADDRESS, CustomMainScreen.SERVER_PORT), 1000);
             return true;
         } catch (IOException e) {
             return false;
@@ -136,6 +129,7 @@ public class CustomMainScreen extends Screen {
     }
 
     private void join(ServerData p_99703_) {
+        assert this.minecraft != null;
         ConnectScreen.startConnecting(this, this.minecraft, ServerAddress.parseString(p_99703_.ip), p_99703_);
     }
 

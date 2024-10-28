@@ -14,8 +14,6 @@ import victorgponce.com.autisbornmod.Screens.CustomMainScreen;
 @EventBusSubscriber(modid = AUTISBORN_MOD.MODID, bus = Bus.FORGE, value = Dist.CLIENT)
 public class ScreenReplacer {
 
-    private final boolean isFull = false;
-
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
