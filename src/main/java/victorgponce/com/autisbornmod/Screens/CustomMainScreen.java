@@ -33,6 +33,7 @@ public class CustomMainScreen extends Screen {
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation("victorgponce:autisbornmod/textures/background.png");
     private static final ResourceLocation TITLE_TEXTURE = new ResourceLocation("victorgponce:autisbornmod/textures/title.png");
     private static final ResourceLocation BUTTON_TEXTURE = new ResourceLocation("victorgponce:autisbornmod/textures/buttoncobble.png");
+    private static final ResourceLocation METAL_TEXTURE = new ResourceLocation("victorgponce:autisbornmod/textures/metal.png");
     private String status = "El servidor se encuentra OFFLINE";
     private final ExecutorService executorService = Executors.newFixedThreadPool(3);
     private static final String SERVER_ADDRESS = "node-marb.ponchisaohosting.xyz";
@@ -62,28 +63,6 @@ public class CustomMainScreen extends Screen {
         int copyrightWidth = this.font.width(COPYRIGHT_TEXT);
         int j = this.width - copyrightWidth - 2;
 
-        // this.addRenderableWidget(new Button(this.width / 2 - 100, l + 24, buttonWidth, buttonHeight,
-        //         Component.literal("AUTISBORN"), button -> this.minecraftInstance.execute(() -> {
-        //             // Conexión directa al servidor al pulsar el botón
-        //             ServerData serverData = new ServerData("AUTISBORN", SERVER_ADDRESS + ":" + SERVER_PORT, false);
-        //             join(serverData);
-        //             Minecraft.getInstance().options.setSoundCategoryVolume(SoundSource.MUSIC, 0.0F);
-        //         })){
-        //     @Override
-        //     public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        //         // Dibujar la textura personalizada del botón
-        //         AUTISBORN_MOD.LOGGER.info("seteando textura de boton");
-        //         Minecraft.getInstance().getTextureManager().bindForSetup(BUTTON_TEXTURE);  // Asegúrate de que la textura esté cargada
-        //         RenderSystem.enableBlend();  // Habilitar el modo de mezcla para que los colores se vean bien
-        //         // Dibuja la textura completa para el botón en las coordenadas correspondientes
-        //         blit(matrices, this.x, this.y, 0, 0, this.width, this.height);  // 'this.x' y 'this.y' son las coordenadas del botón
-        //         RenderSystem.disableBlend();  // Deshabilitar el modo de mezcla
-//
-        //         // Dibujar el texto del botón sobre la textura
-        //         drawCenteredString(matrices, Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + this.height / 2 - 4, 0xFFFFFF);
-        //     }
-        // });
-
         this.addRenderableWidget(new ImageButton(this.width / 2 - 100, l + 24, buttonWidth, buttonHeight, 0, 0, 200, BUTTON_TEXTURE, 200, 20, (p_96791_) -> {
             // Conexión directa al servidor al pulsar el botón
             ServerData serverData = new ServerData("AUTISBORN", SERVER_ADDRESS + ":" + SERVER_PORT, false);
@@ -106,19 +85,62 @@ public class CustomMainScreen extends Screen {
             }
         });
 
-
-        this.addRenderableWidget(new Button(this.width / 2 - 100, l + 68, 98, 20,
-                Component.translatable("menu.options"), (p_96788_) -> {
-            this.minecraft.setScreen(new OptionsScreen(this, this.minecraft.options));
-        }));
-
-        this.addRenderableWidget(new Button(this.width / 2 + 2, l + 68, 98, 20,
-                Component.translatable("menu.quit"), button -> executorService.submit(this.minecraftInstance::stop)));
-
-        this.addRenderableWidget(new Button(this.width / 2 - 100, l + 23 * 2, buttonWidth, buttonHeight,
-                Component.translatable("fml.menu.mods"), button -> {
+        this.addRenderableWidget(new ImageButton(this.width / 2 - 100, l + 23 * 2, buttonWidth, buttonHeight, 0, 0, 200, BUTTON_TEXTURE, 200, 20, (modsButton) -> {
             this.minecraft.setScreen(new net.minecraftforge.client.gui.ModListScreen(this));
-        }));
+        }, Component.translatable("fml.menu.mods")){
+            @Override
+            public void renderButton(PoseStack p_94282_, int p_94283_, int p_94284_, float p_94285_) {
+                drawCenteredString(p_94282_, Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + this.height / 2 - 4, 0xFFFFFF);
+                // Establecer el color según si está en hover o no
+                if (this.isHoveredOrFocused()) {
+                    // Si el botón está en hover, dibujamos un contorno blanco
+                    RenderSystem.setShaderColor(0.7f, 0.7f, 0.7f, 1.0f);
+                } else {
+                    // Si no está en hover, restauramos el color original (puedes cambiarlo si lo deseas)
+                    RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f); // Blanco (o cualquier color)
+                }
+
+                super.renderButton(p_94282_, p_94283_, p_94284_, p_94285_);
+            }
+        });
+
+        this.addRenderableWidget(new ImageButton(this.width / 2 - 100, l + 68, 98, 20, 0, 0, 98, METAL_TEXTURE, 98, 20, (optionsButton) -> {
+            this.minecraft.setScreen(new OptionsScreen(this, this.minecraft.options));
+        }, Component.translatable("menu.options")) {
+            @Override
+            public void renderButton(PoseStack p_94282_, int p_94283_, int p_94284_, float p_94285_) {
+                drawCenteredString(p_94282_, Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + this.height / 2 - 4, 0xFFFFFF);
+                // Establecer el color según si está en hover o no
+                if (this.isHoveredOrFocused()) {
+                    // Si el botón está en hover, dibujamos un contorno blanco
+                    RenderSystem.setShaderColor(0.4f, 0.8f, 0.8f, 1.0f);
+                } else {
+                    // Si no está en hover, restauramos el color original (puedes cambiarlo si lo deseas)
+                    RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f); // Blanco (o cualquier color)
+                }
+
+                super.renderButton(p_94282_, p_94283_, p_94284_, p_94285_);
+            }
+        });
+
+        this.addRenderableWidget(new ImageButton(this.width / 2 + 2, l + 68, 98, 20, 0, 0, 98, METAL_TEXTURE, 98, 20, (optionsButton) -> {
+            executorService.submit(this.minecraftInstance::stop);
+        }, Component.translatable("menu.quit")) {
+            @Override
+            public void renderButton(PoseStack p_94282_, int p_94283_, int p_94284_, float p_94285_) {
+                drawCenteredString(p_94282_, Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + this.height / 2 - 4, 0xFFFFFF);
+                // Establecer el color según si está en hover o no
+                if (this.isHoveredOrFocused()) {
+                    // Si el botón está en hover, dibujamos un contorno blanco
+                    RenderSystem.setShaderColor(0.4f, 0.8f, 0.8f, 1.0f);
+                } else {
+                    // Si no está en hover, restauramos el color original (puedes cambiarlo si lo deseas)
+                    RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f); // Blanco (o cualquier color)
+                }
+
+                super.renderButton(p_94282_, p_94283_, p_94284_, p_94285_);
+            }
+        });
 
         // Botón de Copyright del Menu
         this.addRenderableWidget(new PlainTextButton(j - 3, this.height - 20, copyrightWidth, 10, COPYRIGHT_TEXT, (button) -> executorService.submit(() -> {
